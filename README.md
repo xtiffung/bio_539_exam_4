@@ -6,7 +6,8 @@ python kmer_analyzer.py <sequence_file><output_file>
 
 ## Output Format
 The output file contains one line per k-mer, sorted alphabetically. Each line has the following format:
-<kmer> <total_count> <char1>:<count1> <char2>:<count2>
+
+    <kmer> <total_count> <char1>:<count1> <char2>:<count2>
 
 ## Data Dictionary
 - kmer: The substring of length k
