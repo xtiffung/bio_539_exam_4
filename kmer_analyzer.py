@@ -15,8 +15,8 @@ def validate_sequence(sequence, k):
     - Contains only valid nucleotides: A, C, G, T
     """
     
-    # Check that sequence is long enough to form at least one k-mer
-    if len(sequence) < k:
+    # Must be longer than k (not equal)
+    if len(sequence) <= k:
         return False
     
     # Ensure every charter is a valid DNA nucleotide
