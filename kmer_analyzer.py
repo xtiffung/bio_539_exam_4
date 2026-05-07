@@ -72,7 +72,7 @@ def main():
             global_kmer_data = merge_kmer_data(global_kmer_data, seq_data)
             
         # write once at the end
-        write_results_to_file(kmer_data, output_file)
+        write_results_to_file(global_kmer_data, output_file)
 
 if __name__ == '__main__':
     main()
