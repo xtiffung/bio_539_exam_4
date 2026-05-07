@@ -4,7 +4,7 @@ def validate_sequence(sequence, k):
     if len(sequence) < k:
         return False
     for nucleotide in sequence:
-        if nucleotide in '1234567890':
+        if nucleotide not in 'ACGT':
             return False
     return True
 
