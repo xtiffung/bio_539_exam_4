@@ -1,0 +1,6 @@
+AT 1 G:1
+CT 2 G:2
+GA 1 A:1
+GT 2 C:2
+TC 2 T:2
+TG 3 A:1 T:2
