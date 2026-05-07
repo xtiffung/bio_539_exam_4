@@ -31,6 +31,25 @@ def count_kmers_with_context(sequence, k):
     
     return kmer_data
 
+def merge_kmer_data(global_data, new_data):
+    """
+    Merge k-mer counts from one sequence into the global dataset.
+    """
+    for kmer in new_data:
+        if kmer not in global_data:
+            global_data[kmer] = {'count': 0, 'next_chars': {}}
+
+        # Add total k-mer count
+        global_data[kmer]['count'] += new_data[kmer]['count']
+
+        # Add next character counts
+        for char, freq in new_data[kmer]['next_chars'].items():
+            if char not in global_data[kmer]['next_chars']:
+                global_data[kmer]['next_chars'][char] = 0
+
+            global_data[kmer]['next_chars'][char] += freq
+
+    return global_data
 
 def write_results_to_file(kmer_data, output_filename):
     sorted_kmers = sorted(kmer_data.keys())
@@ -73,6 +92,7 @@ def main():
             
         # write once at the end
         write_results_to_file(global_kmer_data, output_file)
+
 
 if __name__ == '__main__':
     main()
