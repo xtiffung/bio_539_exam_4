@@ -14,8 +14,12 @@ def validate_sequence(sequence, k):
     - Has length >= k
     - Contains only valid nucleotides: A, C, G, T
     """
+    
+    # Check that sequence is long enough to form at least one k-mer
     if len(sequence) < k:
         return False
+    
+    # Ensure every charter is a valid DNA nucleotide
     for nucleotide in sequence:
         if nucleotide not in 'ACGT':
             return False
@@ -36,13 +40,19 @@ def update_kmer_count(kmer_data, kmer, next_char):
     - Increments total k-mer count
     - Tracks how often each nucleotide follows the k-mer
     """
+    
+    # If k-mer has not been seen befor, initialize its data structure
     if kmer not in kmer_data:
         kmer_data[kmer] = {'count': 0, 'next_chars': {}}
     
+    # Increment total count for this k-mer
     kmer_data[kmer]['count'] += 1
     
+    # If this next charater hasn't been seen for this k-mer, initialize it
     if next_char not in kmer_data[kmer]['next_chars']:
         kmer_data[kmer]['next_chars'][next_char] = 0
+    
+    # Increment the frequency of this next character
     kmer_data[kmer]['next_chars'][next_char] += 1
 
     return kmer_data
@@ -62,12 +72,21 @@ def count_kmers_with_context(sequence, k):
     - Extracts each k-mer
     - Records the character immediately following it
     """
+    
+    # Dictionary to store reults for this single sequence
     kmer_data = {}
     
+    # Loop through sequence to extract all k-mers with a following character
+    # Stop at len (sequence) - k so it does not go out of bounds
     for i in range(len(sequence) - k):
+        
+        # Extract k-mer substring
         kmer = sequence[i:i+k]
+        
+        # Get the character immediately following the k-mer
         next_char = sequence[i+k]
         
+        # Update counts using helper function
         kmer_data = update_kmer_count(kmer_data, kmer, next_char)
     
     return kmer_data
@@ -86,18 +105,25 @@ def merge_kmer_data(global_data, new_data):
     - Total k-mer counts
     - Next-character frequencies
     """
+    
+    # Loop through each k-mer in the new dataset
     for kmer in new_data:
+        
+        # If k-mer doesn't exist in global data, initialize it
         if kmer not in global_data:
             global_data[kmer] = {'count': 0, 'next_chars': {}}
 
-        # Add total k-mer count
+        # Add total k-mer count from this sequence 
         global_data[kmer]['count'] += new_data[kmer]['count']
 
-        # Add next character counts
+        # Merge next-character frequencies 
         for char, freq in new_data[kmer]['next_chars'].items():
+            
+            # Initialize character if not already present
             if char not in global_data[kmer]['next_chars']:
                 global_data[kmer]['next_chars'][char] = 0
 
+            # Add frequency from this sequence 
             global_data[kmer]['next_chars'][char] += freq
 
     return global_data
@@ -114,18 +140,30 @@ def write_results_to_file(kmer_data, output_filename):
 
     K-mers are sorted alphabetically for consistent output.
     """
+   
+    # Sort k-mers alphabetically for consistent output
     sorted_kmers = sorted(kmer_data.keys())
     
+    # Open output file for writing
     with open(output_filename, 'w') as f:
+        
+        # Loop through each k-mer
         for kmer in sorted_kmers:
+            
+            # Total count of this k-mer
             total = kmer_data[kmer]['count']
+            
+            # Dictionary of next-character frequencies
             next_chars = kmer_data[kmer]['next_chars']
             
+            # Convert next-character dictionary into formatted string
+            # Example: "A:1 T:2"
             next_char_str = " ".join(
                 f"{char}:{freq}" 
                 for char, freq in sorted(next_chars.items())
             )
             
+            # Write formmated line to file
             f.write(f"{kmer} {total} {next_char_str}\n")
 
 def main():
@@ -139,32 +177,39 @@ def main():
     5. Merge results across sequences
     6. Write final output to file
     """
+   
+    # Read command line arguments
     sequence_file = sys.argv[1]
     k = int(sys.argv[2])
     output_file = sys.argv[3]
     
     print(f"Reading sequences from {sequence_file}...")
     
-    # create global storage
+    # Dictionary to hold combined results across all sequences
     global_kmer_data = {}
 
+    # Open and read the input file line by line
     with open(sequence_file, 'r') as f:
         for sequence in f:
+            
+            # Remove whitespace/newline characters
             sequence = sequence.strip()
 
+            # Skip invalid sequences and print warning
             if not validate_sequence(sequence, k):
                 print(f"  Warning: Skipping sequence")
                 continue
             
-            # process one sequence
+            # Process individual sequence to get k-mer counts
             seq_data = count_kmers_with_context(sequence, k)
             
-            # merge results 
+            # Merge this sequence's data into the global dataset
             global_kmer_data = merge_kmer_data(global_kmer_data, seq_data)
             
-        # write once at the end
+        # After all sequences are processed, write final results once
         write_results_to_file(global_kmer_data, output_file)
 
 
+# Entry point: ensures main() runs only when script is executed directly 
 if __name__ == '__main__':
     main()
