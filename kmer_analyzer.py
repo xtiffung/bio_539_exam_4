@@ -53,6 +53,9 @@ def main():
     output_file = sys.argv[3]
     
     print(f"Reading sequences from {sequence_file}...")
+    
+    # create global storage
+    global_kmer_data = {}
 
     with open(sequence_file, 'r') as f:
         for sequence in f:
@@ -62,9 +65,14 @@ def main():
                 print(f"  Warning: Skipping sequence")
                 continue
             
-            kmer_data = count_kmers_with_context(sequence, k) 
+            # process one sequence
+            seq_data = count_kmers_with_context(sequence, k)
             
-            write_results_to_file(kmer_data, output_file)
+            # merge results 
+            global_kmer_data = merge_kmer_data(global_kmer_data, seq_data)
+            
+        # write once at the end
+        write_results_to_file(kmer_data, output_file)
 
 if __name__ == '__main__':
     main()
